@@ -25,7 +25,7 @@ const Home: React.FC = () => {
         navigate("/list");
       })
       .catch((error) => {
-        console.log(error);
+        alert(error.message);
       });
   };
 
