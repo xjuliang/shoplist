@@ -54,23 +54,12 @@ const MainList: React.FC = () => {
             const itemsDb: Item[] = Object.values(data);
 
             setItems(itemsDb);
+            setStatus(Status.Success);
           }
         });
       }
     });
-
-    const data = localStorage.getItem("items");
-
-    if (data != null) {
-      setItems(JSON.parse(data));
-      setStatus(Status.Success);
-    }
   }, []);
-
-  //save items in localStorage
-  useEffect(() => {
-    localStorage.setItem("items", JSON.stringify(items));
-  }, [items]);
 
   const add = (e: React.FormEvent<Form>) => {
     e.preventDefault();
