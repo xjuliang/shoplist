@@ -36,6 +36,9 @@ const MainList: React.FC = () => {
 
   const handleSignOut = () => {
     signOut(auth)
+      .then(() => {
+        setItems([]);
+      })
       .then(() => navigate("/home"))
       .catch((error) => {
         alert(error.message);
@@ -48,15 +51,15 @@ const MainList: React.FC = () => {
       if (user) {
         onValue(ref(db, `/${auth.currentUser?.uid}`), (snapshot) => {
           setItems([]);
-          const data = snapshot.val();
+          const dataDb = snapshot.val();
 
-          if (data) {
-            const itemsDb: Item[] = Object.values(data);
+          if (dataDb !== null) {
+            const itemsDb: Item[] = Object.values(dataDb);
 
             setItems(itemsDb);
-            setStatus(Status.Success);
           }
         });
+        setStatus(Status.Success);
       }
     });
   }, []);
