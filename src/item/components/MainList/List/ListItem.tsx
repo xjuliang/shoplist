@@ -1,5 +1,8 @@
 import React from "react";
 
+import edit from "../../../../Icons/edit.png";
+import trash from "../../../../Icons/trash.png";
+
 import styles from "./ListItem.module.scss";
 
 interface Props {
@@ -11,12 +14,12 @@ const ListItem: React.FC<Props> = ({children, onRemove, onUpdate}) => {
   return (
     <li className={styles.container}>
       <span>{children}</span>
-      <div>
-        <button className={styles.updateButton} onClick={onUpdate}>
-          update
+      <div className={styles.buttons}>
+        <button onClick={onUpdate}>
+          <img alt="edit" src={edit} />
         </button>
-        <button className={styles.deleteButton} onClick={onRemove}>
-          delete
+        <button onClick={onRemove}>
+          <img alt="edit" src={trash} />
         </button>
       </div>
     </li>

@@ -1,21 +1,32 @@
-// Container
-.container {
-  width: 100%;
-  max-width: 480px;
-}
-
-// Header
-.header {
-  h1 {
-    font-weight: 800;
-    font-size: 2rem;
-    margin: 0;
-    margin-bottom: 6px;
-  }
-
+.listContainer {
+  width:90vw;
+  min-width: 340px;
+  max-width: 600px;
+  background-color: rgb(72, 72, 72);
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  
   h3 {
-    font-weight: 300;
+    font-weight: 500;
     font-size: 1.25rem;
     margin: 0;
   }
+
 }
+
+.listHeader {
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+}
+
+.headerBtn{
+  background-color:transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+}
+

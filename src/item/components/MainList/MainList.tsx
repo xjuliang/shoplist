@@ -1,27 +1,31 @@
 import * as React from "react";
-import {Ring} from "@uiball/loaders";
 import {useState, useEffect} from "react";
 import {signOut} from "firebase/auth";
 import {set, ref, onValue, remove, update} from "firebase/database";
 import {useNavigate} from "react-router-dom";
 import {uid} from "uid";
+import {Ring} from "@uiball/loaders";
 
-import Button from "../../../ui/controls/Button";
-import {Item} from "../../types";
 import Modal, {ModalFooter} from "../../../ui/controls/Modal";
-import TextField from "../../../ui/inputs/TextField";
-import Nav from "../Nav";
 import {auth, db} from "../../../firebase";
+import Button from "../../../ui/controls/Button";
+import TextField from "../../../ui/inputs/TextField";
+import Title from "../../../ui/text/title";
+import {Item} from "../../types";
+import configImg from "../../../Icons/config.png";
 
-import List, {ListItem} from "./List";
 import styles from "./MainList.module.scss";
+import List, {ListItem} from "./List";
+import ConfigModal from "./ConfigModal";
+import UpdateModal from "./UpdateModal";
+import AddModal from "./AddModal";
 
 enum Status {
   Init = "init",
   Success = "success",
 }
 
-interface Form extends HTMLFormElement {
+export interface Form extends HTMLFormElement {
   text: HTMLInputElement;
 }
 
@@ -31,6 +35,7 @@ const MainList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: ""});
+  const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -107,71 +112,62 @@ const MainList: React.FC = () => {
     setUpdateItem({...updateItem, text: event.target.value});
   };
 
+  const closeAddModal = () => {
+    setModalVisible(false);
+  };
+
+  const closeUpdateModal = () => {
+    setUpdateModalVisible(false);
+  };
+
+  const closeConfigModal = () => {
+    setConfigModalVisible(false);
+  };
+
   if (status === Status.Init) {
     return <Ring color="#231F20" size={35} />;
   }
 
   return (
     <main className={styles.container}>
-      <Nav>
-        <Button colorScheme="secondary" onClick={handleSignOut}>
-          Log out
-        </Button>
-      </Nav>
-      <List>
+      <Title />
+      <div className={styles.listContainer}>
+        <div className={styles.listHeader}>
+          <Button autoFocus colorScheme="primary" onClick={() => setModalVisible(true)}>
+            Add Item
+          </Button>
+          <button className={styles.headerBtn} onClick={() => setConfigModalVisible(true)}>
+            <img alt="" src={configImg} />
+          </button>
+        </div>
+        <List>
+          {items.map((item) => (
+            <ListItem
+              key={item.id}
+              onRemove={() => handleRemove(item.id)}
+              onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
+                activateUpdate(e, item.id, item.text)
+              }
+            >
+              {item.text}
+            </ListItem>
+          ))}
+        </List>
         <h3>{items.length} item(s)</h3>
-        {items.map((item) => (
-          <ListItem
-            key={item.id}
-            onRemove={() => handleRemove(item.id)}
-            onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-              activateUpdate(e, item.id, item.text)
-            }
-          >
-            {item.text}
-          </ListItem>
-        ))}
-        {updateModalVisible && (
-          <Modal onClose={() => setUpdateModalVisible(false)}>
-            <form onSubmit={(e) => handleUpdate(e, updateItem.id)}>
-              <h2>Update Item</h2>
-              <TextField
-                autoFocus
-                name="text"
-                type="text"
-                value={updateItem.text}
-                onChange={(e) => handleChange(e)}
-              />
-              <ModalFooter>
-                <Button type="button" onClick={() => setUpdateModalVisible(false)}>
-                  Cancel
-                </Button>
-                <Button colorScheme="primary" type="submit">
-                  Update
-                </Button>
-              </ModalFooter>
-            </form>
-          </Modal>
-        )}
-      </List>
-      <Button autoFocus colorScheme="primary" onClick={() => setModalVisible(true)}>
-        Add item
-      </Button>
-      {modalVisible && (
-        <Modal onClose={() => setModalVisible(false)}>
-          <form onSubmit={add}>
-            <h2>Add Item</h2>
-            <TextField autoFocus name="text" type="text" />
-            <ModalFooter>
-              <Button type="button" onClick={() => setModalVisible(false)}>
-                Cancel
-              </Button>
-              <Button colorScheme="primary" type="submit">
-                Add
-              </Button>
-            </ModalFooter>
-          </form>
-        </Modal>
+      </div>
+
+      {modalVisible && <AddModal add={add} closeAddModal={closeAddModal} />}
+
+      {updateModalVisible && (
+        <UpdateModal
+          closeUpdateModal={closeUpdateModal}
+          handleChange={handleChange}
+          handleUpdate={handleUpdate}
+          updateItem={updateItem}
+        />
+      )}
+      {configModalVisible && (
+        <ConfigModal closeConfigModal={closeConfigModal} handleSignOut={handleSignOut} />
       )}
     </main>
   );

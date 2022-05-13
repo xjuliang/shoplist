@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {app, auth, provider} from "../../../firebase";
 import Button from "../../../ui/controls/Button";
 import Nav from "../Nav";
+import Title from "../../../ui/text/title";
 
 import styles from "./Home.module.scss";
 
@@ -31,12 +32,7 @@ const Home: React.FC = () => {
 
   return (
     <main className={styles.container}>
-      <Nav>
-        <p>nav</p>
-      </Nav>
-      <header className={styles.header}>
-        <h1>Supermarket List</h1>
-      </header>
+      <Title />
       <Button autoFocus colorScheme="primary" onClick={signInWithGoogle}>
         Login with Google
       </Button>
