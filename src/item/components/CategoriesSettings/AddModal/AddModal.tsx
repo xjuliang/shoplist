@@ -3,8 +3,8 @@ import React from "react";
 import Button from "../../../../ui/controls/Button";
 import Modal, {ModalFooter} from "../../../../ui/controls/Modal";
 import TextField from "../../../../ui/inputs/TextField";
-import {Form} from "../MainList";
-import styles from "../MainList.module.scss";
+import {Form} from "../CategoriesSettings";
+import styles from "../CategoriesSettings.module.scss";
 
 type AddFunction = (e: React.FormEvent<Form>) => void;
 
@@ -18,7 +18,7 @@ const AddModal: React.FC<Props> = ({closeAddModal, add}) => {
     <Modal onClose={closeAddModal}>
       <form onSubmit={add}>
         <div className={styles.headerContainer}>
-          <h2>Add Item</h2>
+          <h2>Add Category</h2>
         </div>
         <TextField autoFocus name="text" placeholder="Name..." />
         <ModalFooter>

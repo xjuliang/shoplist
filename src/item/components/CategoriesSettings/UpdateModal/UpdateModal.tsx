@@ -3,9 +3,9 @@ import React, {ChangeEventHandler} from "react";
 import Button from "../../../../ui/controls/Button";
 import Modal, {ModalFooter} from "../../../../ui/controls/Modal";
 import TextField from "../../../../ui/inputs/TextField";
-import styles from "../MainList.module.scss";
+import styles from "../CategoriesSettings.module.scss";
 
-interface UpdateItem {
+interface UpdateCategory {
   id: number;
   text: string;
 }
@@ -14,28 +14,28 @@ type HandleChange = (e: React.FormEvent<HTMLFormElement>, id: number) => void;
 
 interface Props {
   closeUpdateModal: VoidFunction;
-  updateItem: UpdateItem;
+  updateCategory: UpdateCategory;
   handleChange: ChangeEventHandler<HTMLInputElement>;
   handleUpdate: HandleChange;
 }
 
 const UpdateModal: React.FC<Props> = ({
   closeUpdateModal,
-  updateItem,
+  updateCategory,
   handleChange,
   handleUpdate,
 }) => {
   return (
     <Modal onClose={closeUpdateModal}>
-      <form onSubmit={(e) => handleUpdate(e, updateItem.id)}>
+      <form onSubmit={(e) => handleUpdate(e, updateCategory.id)}>
         <div className={styles.headerContainer}>
-          <h2>Update Item</h2>
+          <h2>Update Category</h2>
         </div>
         <TextField
           autoFocus
           name="text"
           placeholder="Name..."
-          value={updateItem.text}
+          value={updateCategory.text}
           onChange={handleChange}
         />
         <ModalFooter>

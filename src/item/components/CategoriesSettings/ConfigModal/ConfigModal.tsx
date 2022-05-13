@@ -1,10 +1,9 @@
 import React from "react";
-import {Link} from "react-router-dom";
 
 import Button from "../../../../ui/controls/Button";
 import Modal from "../../../../ui/controls/Modal";
 import closeImg from "../../../../Icons/close.png";
-import styles from "../MainList.module.scss";
+import styles from "../CategoriesSettings.module.scss";
 
 interface Props {
   handleSignOut: VoidFunction;
@@ -21,9 +20,7 @@ const ConfigModal: React.FC<Props> = ({handleSignOut, closeConfigModal}) => {
         </button>
       </div>
       <div className={styles.configContent}>
-        <Link to="/categories">
-          <Button colorScheme="secondary">Categories Settings</Button>
-        </Link>
+        <Button colorScheme="secondary">Categories Settings</Button>
         <Button colorScheme="primary" onClick={handleSignOut}>
           Log out
         </Button>

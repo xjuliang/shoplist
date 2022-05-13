@@ -2,19 +2,17 @@ import * as React from "react";
 import {useState, useEffect} from "react";
 import {signOut} from "firebase/auth";
 import {set, ref, onValue, remove, update} from "firebase/database";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {uid} from "uid";
 import {Ring} from "@uiball/loaders";
 
-import Modal, {ModalFooter} from "../../../ui/controls/Modal";
 import {auth, db} from "../../../firebase";
 import Button from "../../../ui/controls/Button";
-import TextField from "../../../ui/inputs/TextField";
 import Title from "../../../ui/text/title";
-import {Item} from "../../types";
-import configImg from "../../../Icons/config.png";
+import {Category} from "../../types";
+import arrowImg from "../../../Icons/arrow-back.png";
 
-import styles from "./MainList.module.scss";
+import styles from "./CategoriesSettings.module.scss";
 import List, {ListItem} from "./List";
 import ConfigModal from "./ConfigModal";
 import UpdateModal from "./UpdateModal";
@@ -29,12 +27,12 @@ export interface Form extends HTMLFormElement {
   text: HTMLInputElement;
 }
 
-const MainList: React.FC = () => {
-  const [items, setItems] = useState<Item[]>([]);
+const CategoriesSettings: React.FC = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<Status>(Status.Init);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: ""});
+  const [updateCategory, setUpdateCategory] = useState<Category>({id: 0, text: ""});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -42,7 +40,7 @@ const MainList: React.FC = () => {
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
-        setItems([]);
+        setCategories([]);
       })
       .then(() => navigate("/home"))
       .catch((error) => {
@@ -50,18 +48,18 @@ const MainList: React.FC = () => {
       });
   };
 
-  //get items
+  //get categories
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        onValue(ref(db, `/${auth.currentUser?.uid}/items`), (snapshot) => {
-          setItems([]);
+        onValue(ref(db, `/${auth.currentUser?.uid}/categories`), (snapshot) => {
+          setCategories([]);
           const dataDb = snapshot.val();
 
           if (dataDb !== null) {
-            const itemsDb: Item[] = Object.values(dataDb);
+            const categoriesDb: Category[] = Object.values(dataDb);
 
-            setItems(itemsDb);
+            setCategories(categoriesDb);
           }
         });
         setStatus(Status.Success);
@@ -75,41 +73,41 @@ const MainList: React.FC = () => {
 
     if (!text) return;
 
-    const itemId: string = uid();
+    const CategoryId: string = uid();
 
-    set(ref(db, `/${auth.currentUser?.uid}/items/${itemId}`), {
+    set(ref(db, `/${auth.currentUser?.uid}/categories/${CategoryId}`), {
       text: text,
-      id: itemId,
+      id: CategoryId,
     });
     setModalVisible(false);
   };
 
-  const handleRemove = (id: Item["id"]) => {
-    remove(ref(db, `/${auth.currentUser?.uid}/items/${id}`));
+  const handleRemove = (CategoryId: Category["id"]) => {
+    remove(ref(db, `/${auth.currentUser?.uid}/categories/${CategoryId}`));
   };
 
   const activateUpdate = (
     e: React.FormEvent<HTMLFormElement>,
-    id: Item["id"],
-    text: Item["text"],
+    id: Category["id"],
+    text: Category["text"],
   ) => {
     e.preventDefault();
     setUpdateModalVisible(true);
-    setUpdateItem({id: id, text: text});
+    setUpdateCategory({id: id, text: text});
   };
 
-  const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Item["id"]) => {
+  const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Category["id"]) => {
     e.preventDefault();
     const text = e.currentTarget.text.value.trim();
 
     if (!text.length) return;
-    update(ref(db, `/${auth.currentUser?.uid}/items/${id}`), {text: text, id: id});
+    update(ref(db, `/${auth.currentUser?.uid}/categories/${id}`), {text: text, id: id});
     setUpdateModalVisible(false);
-    setUpdateItem({id: 0, text: ""});
+    setUpdateCategory({id: 0, text: ""});
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateItem({...updateItem, text: event.target.value});
+    setUpdateCategory({...updateCategory, text: event.target.value});
   };
 
   const closeAddModal = () => {
@@ -133,27 +131,30 @@ const MainList: React.FC = () => {
       <Title />
       <div className={styles.listContainer}>
         <div className={styles.headerContainer}>
-          <Button autoFocus colorScheme="primary" onClick={() => setModalVisible(true)}>
-            Add Item
-          </Button>
-          <button className={styles.headerBtn} onClick={() => setConfigModalVisible(true)}>
-            <img alt="" src={configImg} />
-          </button>
+          <h2>Categories Settings</h2>
+
+          <Link to="/list">
+            <button className={styles.headerBtn}>
+              <img alt="" src={arrowImg} />
+            </button>
+          </Link>
         </div>
+        <Button autoFocus colorScheme="primary" onClick={() => setModalVisible(true)}>
+          Add Category
+        </Button>
         <List>
-          {items.map((item) => (
+          {categories.map((category) => (
             <ListItem
-              key={item.id}
-              onRemove={() => handleRemove(item.id)}
+              key={category.id}
+              onRemove={() => handleRemove(category.id)}
               onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                activateUpdate(e, item.id, item.text)
+                activateUpdate(e, category.id, category.text)
               }
             >
-              {item.text}
+              {category.text}
             </ListItem>
           ))}
         </List>
-        <h3>{items.length} item(s)</h3>
       </div>
 
       {modalVisible && <AddModal add={add} closeAddModal={closeAddModal} />}
@@ -163,7 +164,7 @@ const MainList: React.FC = () => {
           closeUpdateModal={closeUpdateModal}
           handleChange={handleChange}
           handleUpdate={handleUpdate}
-          updateItem={updateItem}
+          updateCategory={updateCategory}
         />
       )}
       {configModalVisible && (
@@ -173,4 +174,4 @@ const MainList: React.FC = () => {
   );
 };
 
-export default MainList;
+export default CategoriesSettings;
