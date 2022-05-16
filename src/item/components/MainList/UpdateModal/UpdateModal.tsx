@@ -2,7 +2,9 @@ import React, {ChangeEventHandler} from "react";
 
 import Button from "../../../../ui/controls/Button";
 import Modal, {ModalFooter} from "../../../../ui/controls/Modal";
+import SelectComp from "../../../../ui/inputs/Select";
 import TextField from "../../../../ui/inputs/TextField";
+import {Category} from "../../../types";
 import styles from "../MainList.module.scss";
 
 interface UpdateItem {
@@ -10,13 +12,14 @@ interface UpdateItem {
   text: string;
 }
 
-type HandleChange = (e: React.FormEvent<HTMLFormElement>, id: number) => void;
+type UpdateFunction = (e: React.FormEvent<HTMLFormElement>) => void;
 
 interface Props {
   closeUpdateModal: VoidFunction;
+  handleUpdate: UpdateFunction;
   updateItem: UpdateItem;
   handleChange: ChangeEventHandler<HTMLInputElement>;
-  handleUpdate: HandleChange;
+  categories: Category[];
 }
 
 const UpdateModal: React.FC<Props> = ({
@@ -24,10 +27,11 @@ const UpdateModal: React.FC<Props> = ({
   updateItem,
   handleChange,
   handleUpdate,
+  categories,
 }) => {
   return (
     <Modal onClose={closeUpdateModal}>
-      <form onSubmit={(e) => handleUpdate(e, updateItem.id)}>
+      <form onSubmit={handleUpdate}>
         <div className={styles.headerContainer}>
           <h2>Update Item</h2>
         </div>
@@ -38,6 +42,7 @@ const UpdateModal: React.FC<Props> = ({
           value={updateItem.text}
           onChange={handleChange}
         />
+        <SelectComp categories={categories} handleChange={handleChange} />
         <ModalFooter>
           <Button type="button" onClick={closeUpdateModal}>
             Cancel

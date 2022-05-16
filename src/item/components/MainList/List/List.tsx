@@ -26,19 +26,24 @@ const List: React.FC<Props> = ({categories, items, handleRemove, activateUpdate}
     const categoryItems = items.filter((item) => item.category == category);
 
     if (categoryItems.length) {
-      return categoryItems.map((item) => (
-        <ListItem
-          key={item.id}
-          onRemove={() => handleRemove(item.id)}
-          onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-            activateUpdate(e, item.id, item.text, item.category)
-          }
-        >
-          {item.text}
-        </ListItem>
-      ));
-    } else {
-      return <p>Empty category.</p>;
+      return (
+        <>
+          <h3>
+            {category} - {categoryItems.length} item(s)
+          </h3>
+          {categoryItems.map((item) => (
+            <ListItem
+              key={item.id}
+              onRemove={() => handleRemove(item.id)}
+              onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
+                activateUpdate(e, item.id, item.text, item.category)
+              }
+            >
+              {item.text}
+            </ListItem>
+          ))}
+        </>
+      );
     }
   };
 
@@ -46,7 +51,6 @@ const List: React.FC<Props> = ({categories, items, handleRemove, activateUpdate}
     <ul className={styles.container}>
       {categories.map((category) => (
         <div key={category.value} className={styles.categoryContainer}>
-          <h3>{category.label}</h3>
           {showCategoryItems(category.label)}
         </div>
       ))}

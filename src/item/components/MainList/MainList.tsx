@@ -111,11 +111,11 @@ const MainList: React.FC = () => {
     setUpdateItem({id: id, text: text, category: category});
   };
 
-  const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Item["id"]) => {
+  const handleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!updateItem.text.length) return;
-    update(ref(db, `/${auth.currentUser?.uid}/items/${id}`), {
+    if (!updateItem.text.length || !updateItem.category) return;
+    update(ref(db, `/${auth.currentUser?.uid}/items/${updateItem.id}`), {
       text: updateItem.text,
       id: updateItem.id,
       category: updateItem.category,
@@ -130,7 +130,7 @@ const MainList: React.FC = () => {
 
   const handleChangeUpdate = (event: HandleChange) => {
     if (event.label) {
-      setUpdateItem({...addItem, category: event.label});
+      setUpdateItem({...updateItem, category: event.label});
     } else setUpdateItem({...updateItem, text: event.target.value});
   };
 
@@ -168,7 +168,6 @@ const MainList: React.FC = () => {
           handleRemove={handleRemove}
           items={items}
         />
-        <h3>{items.length} item(s)</h3>
       </div>
       {modalVisible && (
         <AddModal
@@ -181,6 +180,7 @@ const MainList: React.FC = () => {
       )}
       {updateModalVisible && (
         <UpdateModal
+          categories={categories}
           closeUpdateModal={closeUpdateModal}
           handleChange={handleChangeUpdate}
           handleUpdate={handleUpdate}
