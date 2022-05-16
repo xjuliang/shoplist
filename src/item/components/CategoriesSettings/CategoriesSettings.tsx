@@ -32,7 +32,7 @@ const CategoriesSettings: React.FC = () => {
   const [status, setStatus] = useState<Status>(Status.Init);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [updateCategory, setUpdateCategory] = useState<Category>({id: 0, text: ""});
+  const [updateCategory, setUpdateCategory] = useState<Category>({value: 0, label: ""});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -76,38 +76,38 @@ const CategoriesSettings: React.FC = () => {
     const CategoryId: string = uid();
 
     set(ref(db, `/${auth.currentUser?.uid}/categories/${CategoryId}`), {
-      text: text,
-      id: CategoryId,
+      label: text,
+      value: CategoryId,
     });
     setModalVisible(false);
   };
 
-  const handleRemove = (CategoryId: Category["id"]) => {
+  const handleRemove = (CategoryId: Category["value"]) => {
     remove(ref(db, `/${auth.currentUser?.uid}/categories/${CategoryId}`));
   };
 
   const activateUpdate = (
     e: React.FormEvent<HTMLFormElement>,
-    id: Category["id"],
-    text: Category["text"],
+    id: Category["value"],
+    text: Category["label"],
   ) => {
     e.preventDefault();
     setUpdateModalVisible(true);
-    setUpdateCategory({id: id, text: text});
+    setUpdateCategory({value: id, label: text});
   };
 
-  const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Category["id"]) => {
+  const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Category["value"]) => {
     e.preventDefault();
     const text = e.currentTarget.text.value.trim();
 
     if (!text.length) return;
-    update(ref(db, `/${auth.currentUser?.uid}/categories/${id}`), {text: text, id: id});
+    update(ref(db, `/${auth.currentUser?.uid}/categories/${id}`), {label: text, value: id});
     setUpdateModalVisible(false);
-    setUpdateCategory({id: 0, text: ""});
+    setUpdateCategory({value: 0, label: ""});
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateCategory({...updateCategory, text: event.target.value});
+    setUpdateCategory({...updateCategory, label: event.target.value});
   };
 
   const closeAddModal = () => {
@@ -145,13 +145,13 @@ const CategoriesSettings: React.FC = () => {
         <List>
           {categories.map((category) => (
             <ListItem
-              key={category.id}
-              onRemove={() => handleRemove(category.id)}
+              key={category.value}
+              onRemove={() => handleRemove(category.value)}
               onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                activateUpdate(e, category.id, category.text)
+                activateUpdate(e, category.value, category.label)
               }
             >
-              {category.text}
+              {category.label}
             </ListItem>
           ))}
         </List>

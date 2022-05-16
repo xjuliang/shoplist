@@ -6,16 +6,14 @@ import {useNavigate} from "react-router-dom";
 import {uid} from "uid";
 import {Ring} from "@uiball/loaders";
 
-import Modal, {ModalFooter} from "../../../ui/controls/Modal";
 import {auth, db} from "../../../firebase";
 import Button from "../../../ui/controls/Button";
-import TextField from "../../../ui/inputs/TextField";
 import Title from "../../../ui/text/title";
-import {Item} from "../../types";
+import {Category, Item} from "../../types";
 import configImg from "../../../Icons/config.png";
 
 import styles from "./MainList.module.scss";
-import List, {ListItem} from "./List";
+import List from "./List";
 import ConfigModal from "./ConfigModal";
 import UpdateModal from "./UpdateModal";
 import AddModal from "./AddModal";
@@ -31,10 +29,12 @@ export interface Form extends HTMLFormElement {
 
 const MainList: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<Status>(Status.Init);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: ""});
+  const [addItem, setAddItem] = useState<Item>({id: 0, text: "", category: ""});
+  const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: "", category: ""});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -50,7 +50,6 @@ const MainList: React.FC = () => {
       });
   };
 
-  //get items
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -64,6 +63,18 @@ const MainList: React.FC = () => {
             setItems(itemsDb);
           }
         });
+
+        onValue(ref(db, `/${auth.currentUser?.uid}/categories`), (snapshot) => {
+          setCategories([]);
+          const dataDb = snapshot.val();
+
+          if (dataDb !== null) {
+            const categoriesDb: Category[] = Object.values(dataDb);
+
+            setCategories(categoriesDb);
+          }
+        });
+
         setStatus(Status.Success);
       }
     });
@@ -71,17 +82,18 @@ const MainList: React.FC = () => {
 
   const add = (e: React.FormEvent<Form>) => {
     e.preventDefault();
-    const text = e.currentTarget.text.value.trim();
 
-    if (!text) return;
+    if (!addItem.text || !addItem.category) return;
 
     const itemId: string = uid();
 
     set(ref(db, `/${auth.currentUser?.uid}/items/${itemId}`), {
-      text: text,
+      text: addItem.text,
       id: itemId,
+      category: addItem.category,
     });
     setModalVisible(false);
+    setAddItem({id: 0, text: "", category: ""});
   };
 
   const handleRemove = (id: Item["id"]) => {
@@ -92,37 +104,47 @@ const MainList: React.FC = () => {
     e: React.FormEvent<HTMLFormElement>,
     id: Item["id"],
     text: Item["text"],
+    category: Item["category"],
   ) => {
     e.preventDefault();
     setUpdateModalVisible(true);
-    setUpdateItem({id: id, text: text});
+    setUpdateItem({id: id, text: text, category: category});
   };
 
   const handleUpdate = (e: React.FormEvent<HTMLFormElement>, id: Item["id"]) => {
     e.preventDefault();
-    const text = e.currentTarget.text.value.trim();
 
-    if (!text.length) return;
-    update(ref(db, `/${auth.currentUser?.uid}/items/${id}`), {text: text, id: id});
+    if (!updateItem.text.length) return;
+    update(ref(db, `/${auth.currentUser?.uid}/items/${id}`), {
+      text: updateItem.text,
+      id: updateItem.id,
+      category: updateItem.category,
+    });
     setUpdateModalVisible(false);
-    setUpdateItem({id: 0, text: ""});
+    setUpdateItem({id: 0, text: "", category: ""});
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateItem({...updateItem, text: event.target.value});
+  interface HandleChange extends React.ChangeEvent<HTMLInputElement> {
+    label?: string;
+  }
+
+  const handleChangeUpdate = (event: HandleChange) => {
+    if (event.label) {
+      setUpdateItem({...addItem, category: event.label});
+    } else setUpdateItem({...updateItem, text: event.target.value});
   };
 
-  const closeAddModal = () => {
-    setModalVisible(false);
+  const handleChangeAdd = (event: HandleChange) => {
+    if (event.label) {
+      setAddItem({...addItem, category: event.label});
+    } else setAddItem({...addItem, text: event.target.value});
   };
 
-  const closeUpdateModal = () => {
-    setUpdateModalVisible(false);
-  };
+  const closeAddModal = () => setModalVisible(false);
 
-  const closeConfigModal = () => {
-    setConfigModalVisible(false);
-  };
+  const closeUpdateModal = () => setUpdateModalVisible(false);
+
+  const closeConfigModal = () => setConfigModalVisible(false);
 
   if (status === Status.Init) {
     return <Ring color="#231F20" size={35} />;
@@ -140,28 +162,27 @@ const MainList: React.FC = () => {
             <img alt="" src={configImg} />
           </button>
         </div>
-        <List>
-          {items.map((item) => (
-            <ListItem
-              key={item.id}
-              onRemove={() => handleRemove(item.id)}
-              onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                activateUpdate(e, item.id, item.text)
-              }
-            >
-              {item.text}
-            </ListItem>
-          ))}
-        </List>
+        <List
+          activateUpdate={activateUpdate}
+          categories={categories}
+          handleRemove={handleRemove}
+          items={items}
+        />
         <h3>{items.length} item(s)</h3>
       </div>
-
-      {modalVisible && <AddModal add={add} closeAddModal={closeAddModal} />}
-
+      {modalVisible && (
+        <AddModal
+          add={add}
+          addItem={addItem}
+          categories={categories}
+          closeAddModal={closeAddModal}
+          handleChange={handleChangeAdd}
+        />
+      )}
       {updateModalVisible && (
         <UpdateModal
           closeUpdateModal={closeUpdateModal}
-          handleChange={handleChange}
+          handleChange={handleChangeUpdate}
           handleUpdate={handleUpdate}
           updateItem={updateItem}
         />

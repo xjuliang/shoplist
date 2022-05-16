@@ -5,6 +5,6 @@ export interface Item {
 }
 
 export interface Category {
-  id: number;
-  text: string;
+  value: number;
+  label: string;
 }

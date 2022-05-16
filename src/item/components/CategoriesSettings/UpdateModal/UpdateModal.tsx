@@ -6,8 +6,8 @@ import TextField from "../../../../ui/inputs/TextField";
 import styles from "../CategoriesSettings.module.scss";
 
 interface UpdateCategory {
-  id: number;
-  text: string;
+  value: number;
+  label: string;
 }
 
 type HandleChange = (e: React.FormEvent<HTMLFormElement>, id: number) => void;
@@ -27,7 +27,7 @@ const UpdateModal: React.FC<Props> = ({
 }) => {
   return (
     <Modal onClose={closeUpdateModal}>
-      <form onSubmit={(e) => handleUpdate(e, updateCategory.id)}>
+      <form onSubmit={(e) => handleUpdate(e, updateCategory.value)}>
         <div className={styles.headerContainer}>
           <h2>Update Category</h2>
         </div>
@@ -35,7 +35,7 @@ const UpdateModal: React.FC<Props> = ({
           autoFocus
           name="text"
           placeholder="Name..."
-          value={updateCategory.text}
+          value={updateCategory.label}
           onChange={handleChange}
         />
         <ModalFooter>
