@@ -1,10 +1,9 @@
 import * as React from "react";
-import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import {signInWithPopup} from "firebase/auth";
 import {useNavigate} from "react-router-dom";
 
-import {app, auth, provider} from "../../../firebase";
+import {auth, provider} from "../../../firebase";
 import Button from "../../../ui/controls/Button";
-import Nav from "../Nav";
 import Title from "../../../ui/text/title";
 
 import styles from "./Home.module.scss";
@@ -25,9 +24,8 @@ const Home: React.FC = () => {
       .then(() => {
         navigate("/list");
       })
-      .catch((error) => {
-        alert(error.message);
-      });
+      // eslint-disable-next-line no-console
+      .catch(() => alert("Please, login to use the shoplist."));
   };
 
   return (

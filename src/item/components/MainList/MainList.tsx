@@ -2,7 +2,7 @@ import * as React from "react";
 import {useState, useEffect} from "react";
 import {signOut} from "firebase/auth";
 import {set, ref, onValue, remove, update} from "firebase/database";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {uid} from "uid";
 import {Ring} from "@uiball/loaders";
 
@@ -37,6 +37,7 @@ const MainList: React.FC = () => {
   // eslint-disable-next-line prettier/prettier
   const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: "", category: "", marked: false});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
   const [openCategory, setOpenCategory] = useState<string>("");
 
@@ -79,6 +80,10 @@ const MainList: React.FC = () => {
         });
 
         setStatus(Status.Success);
+      }
+      if (!user) {
+        setStatus(Status.Success);
+        setErrorMessage(true);
       }
     });
   }, []);
@@ -173,6 +178,14 @@ const MainList: React.FC = () => {
 
   if (status === Status.Init) {
     return <Ring color="#231F20" size={35} />;
+  }
+
+  if (errorMessage) {
+    return (
+      <Link to="/home">
+        <Button colorScheme="primary">Login to use the app.</Button>
+      </Link>
+    );
   }
 
   return (

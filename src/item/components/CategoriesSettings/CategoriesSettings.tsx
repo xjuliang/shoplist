@@ -34,6 +34,7 @@ const CategoriesSettings: React.FC = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const [updateCategory, setUpdateCategory] = useState<Category>({value: 0, label: ""});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -63,6 +64,10 @@ const CategoriesSettings: React.FC = () => {
           }
         });
         setStatus(Status.Success);
+      }
+      if (!user) {
+        setStatus(Status.Success);
+        setErrorMessage(true);
       }
     });
   }, []);
@@ -124,6 +129,14 @@ const CategoriesSettings: React.FC = () => {
 
   if (status === Status.Init) {
     return <Ring color="#231F20" size={35} />;
+  }
+
+  if (errorMessage) {
+    return (
+      <Link to="/home">
+        <Button colorScheme="primary">Login to use the app.</Button>
+      </Link>
+    );
   }
 
   return (
