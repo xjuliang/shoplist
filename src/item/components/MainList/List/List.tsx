@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, {useRef, MutableRefObject} from "react";
-import {useEffect} from "react";
 
 import {Category, Item} from "../../../types";
 
@@ -32,11 +32,8 @@ const List: React.FC<Props> = ({
   openCategory,
   setOpenCategory,
 }) => {
-  // useEffect(() => {
-  //   setOpenCategory("");
-  // }, [items]);
   const showCategoryItems = (category: string) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parentRef: MutableRefObject<any> = useRef(0);
     const categoryItems = items.filter((item) => item.category == category);
 
@@ -46,6 +43,20 @@ const List: React.FC<Props> = ({
     };
 
     if (categoryItems.length) {
+      const sortedItems: Item[] = categoryItems.sort((a, b) => {
+        const fa = a.text.toLowerCase(),
+          fb = b.text.toLowerCase();
+
+        if (fa < fb) {
+          return -1;
+        }
+        if (fa > fb) {
+          return 1;
+        }
+
+        return 0;
+      });
+
       return (
         <>
           <h3>
@@ -63,7 +74,7 @@ const List: React.FC<Props> = ({
                 : {height: "0px"}
             }
           >
-            {categoryItems.map((item) => (
+            {sortedItems.map((item) => (
               <ListItem
                 key={item.id}
                 onRemove={() => handleRemove(item.id)}
@@ -71,7 +82,7 @@ const List: React.FC<Props> = ({
                   activateUpdate(e, item.id, item.text, item.category)
                 }
               >
-                {item.text}
+                {item.text.charAt(0).toUpperCase() + item.text.slice(1)}
               </ListItem>
             ))}
           </div>
