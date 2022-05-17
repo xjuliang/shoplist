@@ -125,19 +125,33 @@ const MainList: React.FC = () => {
   };
 
   interface HandleChange extends React.ChangeEvent<HTMLInputElement> {
-    label?: string;
+    label: string;
   }
 
   const handleChangeUpdate = (event: HandleChange) => {
-    if (event.label) {
-      setUpdateItem({...updateItem, category: event.label});
-    } else setUpdateItem({...updateItem, text: event.target.value});
+    if (!event) {
+      setUpdateItem({...updateItem, category: ""});
+
+      return;
+    }
+    if (event.label) setUpdateItem({...updateItem, category: event.label});
+    else {
+      event.preventDefault();
+      setUpdateItem({...updateItem, text: event.target.value});
+    }
   };
 
   const handleChangeAdd = (event: HandleChange) => {
-    if (event.label) {
-      setAddItem({...addItem, category: event.label});
-    } else setAddItem({...addItem, text: event.target.value});
+    if (!event) {
+      setAddItem({...addItem, category: ""});
+
+      return;
+    }
+    if (event.label) setAddItem({...addItem, category: event.label});
+    else {
+      event.preventDefault();
+      setAddItem({...addItem, text: event.target.value});
+    }
   };
 
   const closeAddModal = () => setModalVisible(false);
@@ -162,12 +176,16 @@ const MainList: React.FC = () => {
             <img alt="" src={configImg} />
           </button>
         </div>
-        <List
-          activateUpdate={activateUpdate}
-          categories={categories}
-          handleRemove={handleRemove}
-          items={items}
-        />
+        {items.length ? (
+          <List
+            activateUpdate={activateUpdate}
+            categories={categories}
+            handleRemove={handleRemove}
+            items={items}
+          />
+        ) : (
+          <h3>Empty list.</h3>
+        )}
       </div>
       {modalVisible && (
         <AddModal

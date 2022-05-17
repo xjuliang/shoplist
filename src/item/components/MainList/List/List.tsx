@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, {useState, useRef, useEffect} from "react";
 
 import {Category, Item} from "../../../types";
 
@@ -23,25 +24,37 @@ interface Props {
 
 const List: React.FC<Props> = ({categories, items, handleRemove, activateUpdate}) => {
   const showCategoryItems = (category: string) => {
+    const parentRef = useRef(null);
     const categoryItems = items.filter((item) => item.category == category);
+
+    const [showItems, setShowItems] = useState<boolean>(false);
 
     if (categoryItems.length) {
       return (
         <>
           <h3>
             {category} - {categoryItems.length} item(s)
+            <button className={styles.showBtn} onClick={() => setShowItems(!showItems)}>
+              {showItems ? "hide" : "show"}
+            </button>
           </h3>
-          {categoryItems.map((item) => (
-            <ListItem
-              key={item.id}
-              onRemove={() => handleRemove(item.id)}
-              onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                activateUpdate(e, item.id, item.text, item.category)
-              }
-            >
-              {item.text}
-            </ListItem>
-          ))}
+          <div
+            ref={parentRef}
+            className={styles.itemsList}
+            style={showItems ? {height: `${parentRef.current?.scrollHeight}px`} : {height: "0px"}}
+          >
+            {categoryItems.map((item) => (
+              <ListItem
+                key={item.id}
+                onRemove={() => handleRemove(item.id)}
+                onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
+                  activateUpdate(e, item.id, item.text, item.category)
+                }
+              >
+                {item.text}
+              </ListItem>
+            ))}
+          </div>
         </>
       );
     }
