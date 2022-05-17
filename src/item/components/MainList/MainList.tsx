@@ -37,6 +37,8 @@ const MainList: React.FC = () => {
   const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: "", category: ""});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
+  const [openCategory, setOpenCategory] = useState<string>("");
+
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -94,6 +96,7 @@ const MainList: React.FC = () => {
     });
     setModalVisible(false);
     setAddItem({id: 0, text: "", category: ""});
+    setOpenCategory("");
   };
 
   const handleRemove = (id: Item["id"]) => {
@@ -182,6 +185,8 @@ const MainList: React.FC = () => {
             categories={categories}
             handleRemove={handleRemove}
             items={items}
+            openCategory={openCategory}
+            setOpenCategory={setOpenCategory}
           />
         ) : (
           <h3>Empty list.</h3>
