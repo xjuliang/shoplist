@@ -33,8 +33,9 @@ const MainList: React.FC = () => {
   const [status, setStatus] = useState<Status>(Status.Init);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [addItem, setAddItem] = useState<Item>({id: 0, text: "", category: ""});
-  const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: "", category: ""});
+  const [addItem, setAddItem] = useState<Item>({id: 0, text: "", category: "", marked: false});
+  // eslint-disable-next-line prettier/prettier
+  const [updateItem, setUpdateItem] = useState<Item>({id: 0, text: "", category: "", marked: false});
   const [configModalVisible, setConfigModalVisible] = useState<boolean>(false);
 
   const [openCategory, setOpenCategory] = useState<string>("");
@@ -95,7 +96,7 @@ const MainList: React.FC = () => {
       category: addItem.category,
     });
     setModalVisible(false);
-    setAddItem({id: 0, text: "", category: ""});
+    setAddItem({id: 0, text: "", category: "", marked: false});
     setOpenCategory("");
   };
 
@@ -108,10 +109,11 @@ const MainList: React.FC = () => {
     id: Item["id"],
     text: Item["text"],
     category: Item["category"],
+    marked: Item["marked"],
   ) => {
     e.preventDefault();
     setUpdateModalVisible(true);
-    setUpdateItem({id: id, text: text, category: category});
+    setUpdateItem({id: id, text: text, category: category, marked: marked});
   };
 
   const handleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
@@ -124,7 +126,7 @@ const MainList: React.FC = () => {
       category: updateItem.category,
     });
     setUpdateModalVisible(false);
-    setUpdateItem({id: 0, text: "", category: ""});
+    setUpdateItem({id: 0, text: "", category: "", marked: false});
   };
 
   interface HandleChange extends React.ChangeEvent<HTMLInputElement> {
@@ -157,6 +159,12 @@ const MainList: React.FC = () => {
     }
   };
 
+  const handleMarked = (id: Item["id"], marked: Item["marked"]) => {
+    update(ref(db, `/${auth.currentUser?.uid}/items/${id}`), {
+      marked: !marked,
+    });
+  };
+
   const closeAddModal = () => setModalVisible(false);
 
   const closeUpdateModal = () => setUpdateModalVisible(false);
@@ -183,6 +191,7 @@ const MainList: React.FC = () => {
           <List
             activateUpdate={activateUpdate}
             categories={categories}
+            handleMarked={handleMarked}
             handleRemove={handleRemove}
             items={items}
             openCategory={openCategory}

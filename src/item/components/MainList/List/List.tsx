@@ -13,7 +13,10 @@ type ActivateUpdateModal = (
   id: number,
   text: string,
   category: string,
+  marked: boolean,
 ) => void;
+
+type HandleMarked = (id: number, marked: boolean) => void;
 
 interface Props {
   categories: Category[];
@@ -21,6 +24,7 @@ interface Props {
   handleRemove: RemoveFunction;
   activateUpdate: ActivateUpdateModal;
   openCategory: string;
+  handleMarked: HandleMarked;
   setOpenCategory: (value: string) => void;
 }
 
@@ -31,6 +35,7 @@ const List: React.FC<Props> = ({
   activateUpdate,
   openCategory,
   setOpenCategory,
+  handleMarked,
 }) => {
   const showCategoryItems = (category: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,9 +82,12 @@ const List: React.FC<Props> = ({
             {sortedItems.map((item) => (
               <ListItem
                 key={item.id}
+                handleMarked={handleMarked}
+                id={item.id}
+                marked={item.marked}
                 onRemove={() => handleRemove(item.id)}
                 onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                  activateUpdate(e, item.id, item.text, item.category)
+                  activateUpdate(e, item.id, item.text, item.category, item.marked)
                 }
               >
                 {item.text.charAt(0).toUpperCase() + item.text.slice(1)}
