@@ -139,6 +139,20 @@ const CategoriesSettings: React.FC = () => {
     );
   }
 
+  const sortedCategories: Category[] = categories.sort((a, b) => {
+    const fa = a.label.toLowerCase(),
+      fb = b.label.toLowerCase();
+
+    if (fa < fb) {
+      return -1;
+    }
+    if (fa > fb) {
+      return 1;
+    }
+
+    return 0;
+  });
+
   return (
     <main className={styles.container}>
       <Title />
@@ -155,19 +169,23 @@ const CategoriesSettings: React.FC = () => {
         <Button autoFocus colorScheme="primary" onClick={() => setModalVisible(true)}>
           Add Category
         </Button>
-        <List>
-          {categories.map((category) => (
-            <ListItem
-              key={category.value}
-              onRemove={() => handleRemove(category.value)}
-              onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
-                activateUpdate(e, category.value, category.label)
-              }
-            >
-              {category.label}
-            </ListItem>
-          ))}
-        </List>
+        {sortedCategories.length ? (
+          <List>
+            {sortedCategories.map((category: Category) => (
+              <ListItem
+                key={category.value}
+                onRemove={() => handleRemove(category.value)}
+                onUpdate={(e: React.FormEvent<HTMLFormElement>) =>
+                  activateUpdate(e, category.value, category.label)
+                }
+              >
+                {category.label}
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <h3>No categories yet.</h3>
+        )}
       </div>
 
       {modalVisible && <AddModal add={add} closeAddModal={closeAddModal} />}
